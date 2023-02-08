@@ -2,6 +2,11 @@
 
 ## Setup Instructions
 
+### Set up environment variables
+`cp env.sample .env`
+ Update `.env` with a more secure password
+
+### Build docker images
 `docker compose build`
 
 ## Running instructions
