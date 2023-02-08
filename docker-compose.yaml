@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  work_tracker_api:
+    container_name: work_tracker_api
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
