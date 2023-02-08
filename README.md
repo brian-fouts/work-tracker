@@ -8,6 +8,8 @@
 
 `docker compose up`
 
+### Start the API
+
 ## Running
 
 Open in browser: `localhost:8080`

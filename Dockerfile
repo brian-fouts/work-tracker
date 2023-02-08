@@ -18,7 +18,7 @@ RUN apt install -y \
 
 RUN pip install --upgrade pip
 
-COPY . .
+COPY setup.py setup.py
 RUN pip install -e .[dev]
 
 ENTRYPOINT ["python", "manage.py", "runserver", "0.0.0.0:8080"]

@@ -1,5 +1,23 @@
 version: '3.8'
 services:
+  work_tracker_db:
+    container_name: work_tracker_db
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=mDEg3aU6Oi0q7l88Shex # TODO: don't check this in
+      - POSTGRES_DB=work_tracker
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./.db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
   work_tracker_api:
     container_name: work_tracker_api
     build:
@@ -8,3 +26,12 @@ services:
       - "8080:8080"
     volumes:
       - ./:/app
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=mDEg3aU6Oi0q7l88Shex # TODO: don't check this in
+      - POSTGRES_NAME=work_tracker
+      - POSTGRES_HOST=work_tracker_db
+      - POSTGRES_PORT=5432
+    depends_on:
+      work_tracker_db:
+        condition: service_healthy
