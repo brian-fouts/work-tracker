@@ -8,7 +8,8 @@ if __name__ == "__main__":
         python_requires=">=3.12,<3.13",
         install_requires=[
             "Django==4.1.6",
-            "psycopg2"
+            "psycopg2",
+            "djangorestframework"
         ],
         extras_require={
             "dev": {

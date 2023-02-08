@@ -13,6 +13,10 @@
 
 `docker compose up`
 
+### Migrate the database
+
+`docker compose exec  work_tracker_api bin/migrate-db.sh`
+
 ### Start the API
 
 ## Running
