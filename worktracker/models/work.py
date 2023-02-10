@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 from .project import Project
+
 
 class Work(models.Model):
     user = models.ForeignKey(

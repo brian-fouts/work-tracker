@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Project(models.Model):
@@ -7,7 +7,8 @@ class Project(models.Model):
 
 
 class ProjectMember(models.Model):
-    project = models.ManyToManyField(Project)
-    user = models.ManyToManyField(User)
+    class Meta:
+        unique_together = ["project", "user"]
 
-
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

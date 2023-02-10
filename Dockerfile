@@ -11,14 +11,12 @@ RUN apt install -y \
     python-psycopg2 \
     libpq-dev \
     gcc \
-    curl
-
-#RUN useradd -ms /bin/bash bakersoft
-#USER bakersoft
+    curl \
+    libffi-dev
 
 RUN pip install --upgrade pip
 
 COPY setup.py setup.py
-RUN pip install -e .[dev]
+RUN pip install -e .[dev,client]
 
 ENTRYPOINT ["python", "manage.py", "runserver", "0.0.0.0:8080"]

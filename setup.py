@@ -9,14 +9,11 @@ if __name__ == "__main__":
         install_requires=[
             "Django==4.1.6",
             "psycopg2",
-            "djangorestframework"
+            "djangorestframework",
+            "djangorestframework-simplejwt[crypto]",
         ],
         extras_require={
-            "dev": {
-                "pytest",
-                "isort",
-                "black",
-                "pytest-django"
-            }
+            "dev": {"pytest", "isort", "black", "pytest-django"},
+            "client": {"requests"},
         },
     )
