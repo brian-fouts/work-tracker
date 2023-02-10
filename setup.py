@@ -13,7 +13,7 @@ if __name__ == "__main__":
             "djangorestframework-simplejwt[crypto]",
         ],
         extras_require={
-            "dev": {"pytest", "isort", "black", "pytest-django"},
+            "dev": {"pytest", "isort", "black", "pytest-django", "flake8"},
             "client": {"requests"},
         },
     )
