@@ -4,23 +4,23 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.request import Request
 
 from .forms import UserCreateForm
 from .serializers import UserSerializer
 
 
-def decode_post_body(request):
-    body = request.body
-    return json.loads(body)
-
-
 @api_view(["POST"])
 @permission_classes((permissions.AllowAny,))
-def create_user(request):
-    body = decode_post_body(request)
+def create_user(request: Request) -> JsonResponse:
+    try:
+        body = json.loads(request.body)
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({"errors": ["Malformed request"]}, status=400)
+
     form = UserCreateForm(body)
     if not form.is_valid():
-        return JsonResponse({"errors": form.errors})
+        return JsonResponse({"errors": form.errors}, status=422)
 
     user = User.objects.create_user(
         form.cleaned_data["username"], form.cleaned_data["email"], form.cleaned_data["password"]
@@ -31,16 +31,16 @@ def create_user(request):
 
     serializer = UserSerializer(user)
 
-    return JsonResponse({"user": serializer.data})
+    return JsonResponse(serializer.data)
 
 
 @api_view(["GET"])
 @permission_classes((permissions.AllowAny,))
-def get_user(request, id):
+def get_user(request: Request, id: int) -> JsonResponse:
     try:
         user = User.objects.get(id=id)
     except User.DoesNotExist:
         return JsonResponse({"errors": ["User not found"]}, status=404)
 
     serializer = UserSerializer(user)
-    return JsonResponse({"user": serializer.data})
+    return JsonResponse(serializer.data)

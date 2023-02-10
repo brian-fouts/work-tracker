@@ -25,7 +25,7 @@ class UserClient:
 class ProjectClient:
     def __init__(self, client):
         self.client = client
-        self.url_path = "project/"
+        self.url_path = "projects/"
 
     def create(self, name):
         payload = {
@@ -37,7 +37,16 @@ class ProjectClient:
         return self.client.get(f"{self.url_path}{project_id}/")
 
     def list(self):
-        return self.client.get(f"projects")
+        return self.client.get(self.url_path)
+
+    def update_project(self, project_id, name):
+        payload = {
+            "name": username,
+        }
+        return self.client.put(f"{self.url_path}{project_id}/", payload)
+
+    def delete_project(self, project_id):
+        return self.client.delete(f"{self.url_path}{project_id}/")
 
     def get_members(self, project_id):
         return self.client.get(f"{self.url_path}{project_id}/members/")
@@ -74,8 +83,16 @@ class Client:
             payload = {}
         return requests.post(f"{self.base_url}{url_path}", json=payload, headers=self.headers)
 
+    def put(self, url_path, payload=None):
+        if payload is None:
+            payload = {}
+        return requests.put(f"{self.base_url}{url_path}", json=payload, headers=self.headers)
+
     def get(self, url_path):
         return requests.get(f"{self.base_url}{url_path}", headers=self.headers)
+
+    def delete(self, url_path):
+        return requests.delete(f"{self.base_url}{url_path}", headers=self.headers)
 
     def auth(self, username, password):
         payload = {
@@ -99,20 +116,24 @@ last_name = "test-last"
 response = client.user.create(username, password, email, first_name, last_name)
 
 print(response.json())
-user_id = response.json()["user"]["id"]
+user_id = response.json()["id"]
 
 response = client.user.get(user_id)
 print(response.json())
 
 client.auth(username, password)
 
-
 response = client.project.list()
 print(response.json())
 
 response = client.project.create(f"project-{uuid.uuid4()}")
 print(response.json())
-project_id = response.json()["project"]["id"]
+project_id = response.json()["id"]
+response = client.project.get(project_id)
+print(response.json())
+
+client.project.update_project(project_id, f"project-{uuid.uuid4()}")
+
 response = client.project.get(project_id)
 print(response.json())
 
@@ -128,8 +149,14 @@ print(response.json())
 response = client.project.get_members(project_id)
 print(response.json())
 
-response = client.project.leave_project(project_id)
-print(response.status_code)
+client.project.leave_project(project_id)
+
 
 response = client.project.get_members(project_id)
+print(response.json())
+
+client.project.delete_project(project_id)
+
+
+response = client.project.get(project_id)
 print(response.json())

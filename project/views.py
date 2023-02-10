@@ -1,8 +1,10 @@
 import json
 
+from django.db.utils import IntegrityError
 from django.http import JsonResponse
 from rest_framework import generics, permissions, viewsets
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.request import Request
 
 from worktracker.models.project import Project, ProjectMember
 
@@ -10,70 +12,43 @@ from .forms import ProjectCreateForm
 from .serializers import ProjectMemberSerializer, ProjectSerializer
 
 
-class ProjectMemberViewSet(generics.ListAPIView):
-    serializer_class = ProjectMemberSerializer
-
-    def get_queryset(self):
-        project_id = self.kwargs.get("id")
-        return ProjectMember.objects.filter(project_id=project_id)
-
-
 class ProjectViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
+    @action(detail=True, methods=["post"], name="join-project")
+    def join(self, request: Request, pk: int) -> JsonResponse:
+        project = self.get_object()
+        user = request.user
 
-def decode_post_body(request):
-    body = request.body
-    return json.loads(body)
+        project_member = ProjectMember(project=project, user=user)
+        try:
+            project_member.save()
+        except IntegrityError:
+            return JsonResponse({"errors": ["You have already joined this project"]}, status=409)
 
+        serializer = ProjectMemberSerializer(project_member)
+        return JsonResponse(serializer.data, status=201)
 
-@api_view(["POST"])
-def create_project(request):
-    body = decode_post_body(request)
-    form = ProjectCreateForm(body)
-    if not form.is_valid():
-        return JsonResponse({"errors": form.errors})
+    @action(detail=True, methods=["post"], name="leave-project")
+    def leave(self, request: Request, pk: int) -> JsonResponse:
+        project = self.get_object()
+        user = request.user
 
-    project = Project(name=form.cleaned_data["name"])
-    project.save()
+        try:
+            project_member = ProjectMember.objects.get(project=project, user=user)
+        except ProjectMember.DoesNotExist:
+            return JsonResponse({"errors": ["You are not a member of this project"]}, status=409)
 
-    serializer = ProjectSerializer(project)
+        project_member.delete()
+        return JsonResponse({}, status=204)
 
-    return JsonResponse({"project": serializer.data}, status=201)
+    @action(detail=True, methods=["get"], name="list-members")
+    def members(self, request: Request, pk: int) -> JsonResponse:
+        project = self.get_object()
+        members = ProjectMember.objects.filter(project=project)
 
+        context = {"request": request}
 
-@api_view(["GET"])
-def get_project(request, id):
-    try:
-        project = Project.objects.get(id=id)
-    except Project.DoesNotExist:
-        return JsonResponse({"errors": ["Project not found"]}, status=404)
-
-    serializer = ProjectSerializer(project)
-    return JsonResponse({"project": serializer.data})
-
-
-@api_view(["POST"])
-def join_project(request, id):
-    user = request.user
-    project = Project.objects.get(id=id)
-    project_member = ProjectMember(project=project, user=user)
-    project_member.save()
-    serializer = ProjectMemberSerializer(project_member)
-    return JsonResponse({"member": serializer.data}, status=201)
-
-
-@api_view(["POST"])
-def leave_project(request, id):
-    user = request.user
-    project = Project.objects.get(id=id)
-
-    project_member = ProjectMember.objects.get(project=project, user=user)
-    project_member.delete()
-
-    return JsonResponse({}, status=204)
+        serializer = ProjectMemberSerializer(members, many=True, context=context)
+        return JsonResponse(serializer.data, status=200, safe=False)

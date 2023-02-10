@@ -1,8 +1,8 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    path("<slug:id>/", views.get_user, name="get_user"),
-    path("", views.create_user, name="create_user"),
+    path("<int:id>/", views.get_user, name="get-user"),
+    path("", views.create_user, name="create-user"),
 ]

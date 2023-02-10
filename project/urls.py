@@ -4,11 +4,11 @@ from rest_framework import routers
 from . import views
 
 urlpatterns = [
-    path("<slug:id>/", views.get_project, name="get_project"),
+    # path("<int:id>/", views.project_actions, name="project"),
     re_path(
-        "^(?P<id>.+)/members/$", views.ProjectMemberViewSet.as_view(), name="get_project_members"
+        "^(?P<id>.+)/members/$", views.ProjectMemberList.as_view(), name="get-project-members"
     ),
-    path("<slug:id>/join/", views.join_project, name="join_project"),
-    path("<slug:id>/leave/", views.leave_project, name="leave_project"),
-    path("", views.create_project, name="create_project"),
+    path("<int:id>/join/", views.join_project, name="join-project"),
+    path("<int:id>/leave/", views.leave_project, name="leave-project"),
+    path("", views.ProjectViewSet.as_view(), name="project-actions"),
 ]
