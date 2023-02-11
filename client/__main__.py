@@ -57,11 +57,44 @@ class ProjectClient:
     def leave_project(self, project_id):
         return self.client.post(f"{self.url_path}{project_id}/leave/")
 
+    def get_work(self, project_id):
+        return self.client.get(f"{self.url_path}{project_id}/work/")
+
+
+class WorkClient:
+    def __init__(self, client):
+        self.client = client
+        self.url_path = "work/"
+
+    def create(self, project_id, start_time, duration):
+        payload = {
+            "project": project_id,
+            "start_time": start_time,
+            "duration": duration
+        }
+        return self.client.post(self.url_path, payload)
+
+    def get(self, id):
+        return self.client.get(f"{self.url_path}{id}/")
+
+    def list(self):
+        return self.client.get(self.url_path)
+
+    def update_work(self, id, duration):
+        payload = {
+            "duration": duration,
+        }
+        return self.client.put(f"{self.url_path}{project_id}/", payload)
+
+    def delete_work(self, project_id):
+        return self.client.delete(f"{self.url_path}{project_id}/")
+
 
 class Client:
     def __init__(self, host="localhost", port=8080):
         self.user = UserClient(self)
         self.project = ProjectClient(self)
+        self.work = WorkClient(self)
         self._host = host
         self._port = port
         self._access_token = None
@@ -134,6 +167,7 @@ print(response.json())
 
 client.project.update_project(project_id, f"project-{uuid.uuid4()}")
 
+
 response = client.project.get(project_id)
 print(response.json())
 
@@ -149,8 +183,32 @@ print(response.json())
 response = client.project.get_members(project_id)
 print(response.json())
 
+
+print("WORK")
+response = client.project.get_work(project_id)
+print(response.json())
+
+response = client.work.create(project_id, "2023-01-01T10:10:01", 1.25)
+print(response.json())
+work_id = response.json()['id']
+response = client.work.get(work_id)
+print(response.json())
+response = client.work.get(1)
+print(response.json())
+response = client.project.get_work(project_id)
+print(response.json())
+response = client.work.update_work(work_id, duration=2.5)
+print(response.json())
+response = client.work.delete_work(work_id)
+response = client.work.delete_work(1)
+print(response.json())
+response = client.project.get_work(project_id)
+print(response.json())
+
+
 client.project.leave_project(project_id)
 
+response = client.project.get_work(project_id)
 
 response = client.project.get_members(project_id)
 print(response.json())

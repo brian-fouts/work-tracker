@@ -10,6 +10,8 @@ services:
       - '5432:5432'
     volumes:
       - ./.db:/var/lib/postgresql/data
+      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      - ./pg_log:/var/lib/pgsql/data/pg_log
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
@@ -29,3 +31,17 @@ services:
     depends_on:
       work_tracker_db:
         condition: service_healthy
+      work_tracker_cache:
+        condition: service_healthy
+
+  
+  work_tracker_cache:
+    container_name: work_tracker_cache
+    image: redis:7.0.8
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

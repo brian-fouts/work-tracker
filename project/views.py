@@ -5,8 +5,10 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 
 from worktracker.models.project import Project, ProjectMember
+from worktracker.models.work import Work
 
 from .serializers import ProjectMemberSerializer, ProjectSerializer
+from work.serializers import WorkSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -49,3 +51,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serializer = ProjectMemberSerializer(members, many=True, context=context)
         return JsonResponse(serializer.data, status=200, safe=False)
+
+    @action(detail=True, methods=["get"], name="list-work")
+    def work(self, request: Request, pk: int) -> JsonResponse:
+        project = self.get_object()
+        user = request.user
+
+        try:
+            project_member = ProjectMember.objects.get(project=project, user=user)
+        except ProjectMember.DoesNotExist:
+            return JsonResponse({"errors": ["You are not a member of this project"]}, status=403)
+
+        works = Work.objects.filter(project=project)
+        context = {"request": request}
+
+        serializer = WorkSerializer(works, many=True, context=context)
+        return JsonResponse(serializer.data, safe=False)
