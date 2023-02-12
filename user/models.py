@@ -17,9 +17,9 @@ class UserCache:
         result = cache.get(cache_key)
 
         if result:
-            logging.debug(f"CACHE HIT: {cache_key}")
+            logging.error(f"CACHE HIT: {cache_key}")
         else:
-            logging.debug(f"CACHE MISS: {cache_key}")
+            logging.error(f"CACHE MISS: {cache_key}")
         return result
 
     @classmethod

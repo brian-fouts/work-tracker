@@ -6,7 +6,7 @@ import requests
 class UserClient:
     def __init__(self, client):
         self.client = client
-        self.url_path = "user/"
+        self.url_path = "users/"
 
     def create(self, username, password, email, first_name, last_name):
         payload = {

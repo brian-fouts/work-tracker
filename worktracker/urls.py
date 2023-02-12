@@ -24,7 +24,7 @@ router = routers.SimpleRouter()
 router.register(r"projects", project.views.ProjectViewSet)
 
 urlpatterns = [
-    path("user/", include("user.urls")),
+    path("users/", include("user.urls")),
     path("work/", include("work.urls")),
     path("admin/", admin.site.urls),
     path("token/", TokenObtainPairView.as_view(), name="token-obtain-pair"),
