@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "worktracker",
+    "user.apps.UserConfig",
+    "project.apps.ProjectConfig",
+    "work.apps.WorkConfig",
     "django.contrib.staticfiles",
     "rest_framework",
 ]
@@ -91,11 +94,12 @@ DATABASES = {
 }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'work_tracker_cache:6379',
+    "default": {
+        "BACKEND": "redis_cache.RedisCache",
+        "LOCATION": "work_tracker_cache:6379",
     },
 }
+AUTH_USER_MODEL = "user.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -134,3 +138,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Cache Settings
+USER_CACHE_TTL = int(os.environ.get("USER_CACHE_TTL", 60))
+PROJECT_MEMBER_CACHE_TTL = int(os.environ.get("PROJECT_MEMBER_CACHE_TTL", 60))

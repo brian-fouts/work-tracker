@@ -67,11 +67,7 @@ class WorkClient:
         self.url_path = "work/"
 
     def create(self, project_id, start_time, duration):
-        payload = {
-            "project": project_id,
-            "start_time": start_time,
-            "duration": duration
-        }
+        payload = {"project": project_id, "start_time": start_time, "duration": duration}
         return self.client.post(self.url_path, payload)
 
     def get(self, id):
@@ -190,7 +186,7 @@ print(response.json())
 
 response = client.work.create(project_id, "2023-01-01T10:10:01", 1.25)
 print(response.json())
-work_id = response.json()['id']
+work_id = response.json()["id"]
 response = client.work.get(work_id)
 print(response.json())
 response = client.work.get(1)
@@ -208,7 +204,9 @@ print(response.json())
 
 client.project.leave_project(project_id)
 
+print("THIS SHOULD FAIL")
 response = client.project.get_work(project_id)
+print(response.json())
 
 response = client.project.get_members(project_id)
 print(response.json())

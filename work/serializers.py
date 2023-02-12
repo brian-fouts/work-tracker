@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from worktracker.models.work import Work
+from .models import Work
 
 
 class WorkSerializer(serializers.ModelSerializer):

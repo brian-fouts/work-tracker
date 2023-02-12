@@ -12,7 +12,8 @@ RUN apt install -y \
     libpq-dev \
     gcc \
     curl \
-    libffi-dev
+    libffi-dev \
+    vim
 
 RUN pip install --upgrade pip
 

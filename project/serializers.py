@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from user.serializers import UserSerializer
-from worktracker.models.project import Project
+
+from .models import Project
 
 
 class ProjectSerializer(serializers.ModelSerializer):

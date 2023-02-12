@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
 from django.db import models
 
-from .project import Project
+from project.models import Project
+from user.models import User
 
 
 class Work(models.Model):

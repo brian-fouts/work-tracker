@@ -1,14 +1,14 @@
 from django.db.utils import IntegrityError
 from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 
-from worktracker.models.project import Project, ProjectMember
-from worktracker.models.work import Work
+from project.models import Project, ProjectMember
+from work.models import Work
+from work.serializers import WorkSerializer
 
 from .serializers import ProjectMemberSerializer, ProjectSerializer
-from work.serializers import WorkSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -20,14 +20,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = self.get_object()
         user = request.user
 
-        project_member = ProjectMember(project=project, user=user)
         try:
-            project_member.save()
+            project_member = ProjectMember.objects.create(project=project, user=user)
         except IntegrityError:
-            return JsonResponse({"errors": ["You have already joined this project"]}, status=409)
+            return JsonResponse(
+                {"errors": ["You have already joined this project"]},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         serializer = ProjectMemberSerializer(project_member)
-        return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"], name="leave-project")
     def leave(self, request: Request, pk: int) -> JsonResponse:
@@ -37,10 +39,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         try:
             project_member = ProjectMember.objects.get(project=project, user=user)
         except ProjectMember.DoesNotExist:
-            return JsonResponse({"errors": ["You are not a member of this project"]}, status=409)
+            return JsonResponse(
+                {"errors": ["You are not a member of this project"]},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         project_member.delete()
-        return JsonResponse({}, status=204)
+        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["get"], name="list-members")
     def members(self, request: Request, pk: int) -> JsonResponse:
@@ -50,7 +55,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         context = {"request": request}
 
         serializer = ProjectMemberSerializer(members, many=True, context=context)
-        return JsonResponse(serializer.data, status=200, safe=False)
+        return JsonResponse(serializer.data, safe=False)
 
     @action(detail=True, methods=["get"], name="list-work")
     def work(self, request: Request, pk: int) -> JsonResponse:
@@ -58,12 +63,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         user = request.user
 
         try:
-            project_member = ProjectMember.objects.get(project=project, user=user)
+            ProjectMember.objects.get(project=project, user=user)
         except ProjectMember.DoesNotExist:
-            return JsonResponse({"errors": ["You are not a member of this project"]}, status=403)
+            return JsonResponse(
+                {"errors": ["You are not a member of this project"]},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         works = Work.objects.filter(project=project)
-        context = {"request": request}
 
-        serializer = WorkSerializer(works, many=True, context=context)
+        serializer = WorkSerializer(works, many=True)
         return JsonResponse(serializer.data, safe=False)

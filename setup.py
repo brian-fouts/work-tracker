@@ -11,7 +11,7 @@ if __name__ == "__main__":
             "psycopg2",
             "djangorestframework",
             "djangorestframework-simplejwt[crypto]",
-            "django-redis-cache"
+            "django-redis-cache",
         ],
         extras_require={
             "dev": {"pytest", "isort", "black", "pytest-django", "flake8"},
