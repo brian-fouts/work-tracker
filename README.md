@@ -9,11 +9,19 @@
 
 ## Write readable and well-structured python code.
 ## Introduce a good architecture and follow reasonable best practices of your choice.
+
+- The framework places tests within the app folder, which has some drawbacks. I have moved these to a separate tests folder where all tests are contained
+
 ## Make sure to document your code wherever appropriate.
-TODO
+
+- Tests are thoroughly documented
+- Code is documented when where approriate, but is generally straight forward enough to not require it
+
 ## Users should be able to see the logs for all users involved in the same project.
 ## Creating/updating/deleting logs for others is not allowed.
+## Please write a few unit tests as a proof-of-concept
 
+- I have written a few API tests
 
 ## Setup Instructions
 

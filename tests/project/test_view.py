@@ -49,7 +49,7 @@ def test_work_cannot_be_viewed(authorized_client, project, user):
     """
     GIVEN a Project that has been created through the API
         AND the project has not been joined
-    WHEN the work endpoint is called
+    WHEN the project work endpoint is called
     THEN a 403 response code is returned
     """
     response = authorized_client.get(f"/projects/{project['id']}/work/")
@@ -62,7 +62,7 @@ def test_work_can_be_viewed(authorized_client, project, user):
     """
     GIVEN a Project that has been created through the API
         AND the project has been joined
-    WHEN the work endpoint is called
+    WHEN the project work endpoint is called
     THEN a 200 response code is returned
     """
     authorized_client.post(f"/projects/{project['id']}/join/")

@@ -16,6 +16,7 @@ def password():
 
 @pytest.fixture
 def user(client, username, password):
+    """Creates a user through the API"""
     data = {
         "username": username,
         "password": password,
@@ -29,22 +30,12 @@ def user(client, username, password):
 
 @pytest.fixture
 def access_token(client, user, username, password):
+    """Generates an access token for the user"""
     data = {"username": username, "password": password}
     response = client.post("/token/", data)
     token_data = json.loads(response.content)
     return token_data["access"]
 
-
-@pytest.fixture
-def headers(access_token):
-    return {"HTTP_AUTHORIZATION": f"Bearer {access_token}"}
-
-
-@pytest.fixture
-def authorized_client(headers):
-    from django.test import Client
-
-    return Client(**headers)
 
 
 @pytest.fixture(autouse=True)
@@ -59,10 +50,23 @@ def reset_cache():
 
 @pytest.fixture
 def client():
+    """Basic client for communicating with the API"""
     from django.test import Client
 
     return Client()
 
+
+@pytest.fixture
+def headers(access_token):
+    return {"HTTP_AUTHORIZATION": f"Bearer {access_token}"}
+
+
+@pytest.fixture
+def authorized_client(headers):
+    """Adds the authentication header to the client"""
+    from django.test import Client
+
+    return Client(**headers)
 
 @pytest.fixture
 def project(authorized_client):

@@ -40,11 +40,12 @@ class WorkViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request: Request, pk: int) -> JsonResponse:
         work = self.get_object()
-        if not user_belongs_to_project(request.user, work.project):
-            return JsonResponse(
-                {"errors": ["You are not a member of this project"]},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        if work.user != request.user.id:
+            if not user_belongs_to_project(request.user, work.project):
+                return JsonResponse(
+                    {"errors": ["You are not a member of this project"]},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         serializer = WorkSerializer(work)
         return JsonResponse(serializer.data)
@@ -58,12 +59,6 @@ class WorkViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        if work.project != request.data["project"]:
-            if not user_belongs_to_project(request.user, work.project):
-                return JsonResponse(
-                    {"errors": ["You are not a member of this project"]},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
         return super().update(request, pk)
 
     def partial_update(self, request: Request, pk: int) -> JsonResponse:
@@ -75,13 +70,6 @@ class WorkViewSet(viewsets.ModelViewSet):
                 {"errors": ["This object does not belong to you"]},
                 status=status.HTTP_403_FORBIDDEN,
             )
-
-        if "project" in request.data and work.project != request.data["project"]:
-            if not user_belongs_to_project(request.user, work.project):
-                return JsonResponse(
-                    {"errors": ["You are not a member of this project"]},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
 
         return super().partial_update(request, pk)
 
