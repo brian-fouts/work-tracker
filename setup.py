@@ -14,7 +14,7 @@ if __name__ == "__main__":
             "django-redis-cache",
         ],
         extras_require={
-            "dev": {"pytest", "isort", "black", "pytest-django", "flake8"},
+            "dev": {"pytest", "isort", "black", "pytest-django", "flake8", "pyjwt"},
             "client": {"requests"},
         },
     )
