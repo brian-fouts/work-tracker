@@ -55,6 +55,13 @@
 
 Open in browser: `localhost:8080`
 
+
+# Run Tests'
+With the docker containers running, run:
+
+`docker compose exec work_tracker_api pytest`
+
+
 # Developer Workflows
 
 ## Formatting
