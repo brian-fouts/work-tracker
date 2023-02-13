@@ -1,4 +1,5 @@
 import logging
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.cache import cache
@@ -10,11 +11,11 @@ from user.models import User
 
 class ProjectMemberCache:
     @classmethod
-    def get_cache_key(cls, project_id, user_id):
+    def get_cache_key(cls, project_id: int, user_id: int) -> str:
         return f"project-member-{project_id}-{user_id}"
 
     @classmethod
-    def get(cls, project_id, user_id):
+    def get(cls, project_id: int, user_id: int) -> Union["ProjectMember", None]:
         cache_key = cls.get_cache_key(project_id, user_id)
         result = cache.get(cache_key)
 
@@ -25,16 +26,16 @@ class ProjectMemberCache:
         return result
 
     @classmethod
-    def set(cls, project_id, user_id, obj):
+    def set(cls, project_id: int, user_id: int, obj: "ProjectMember") -> None:
         cache_key = cls.get_cache_key(project_id, user_id)
         logging.debug(f"CACHE SET: {cache_key}")
-        return cache.set(cache_key, obj, settings.PROJECT_MEMBER_CACHE_TTL)
+        cache.set(cache_key, obj, settings.PROJECT_MEMBER_CACHE_TTL)
 
     @classmethod
-    def invalidate(cls, project_id, user_id):
+    def invalidate(cls, project_id: int, user_id: int) -> None:
         cache_key = cls.get_cache_key(project_id, user_id)
         logging.debug(f"CACHE DELETE: {cache_key}")
-        return cache.delete(cache_key)
+        cache.delete(cache_key)
 
 
 class ProjectMemberManager(models.Manager):
@@ -42,7 +43,9 @@ class ProjectMemberManager(models.Manager):
     Reduces Database requests when fetching a object by project and user
     """
 
-    def get(self, *args, project=None, user=None, **kwargs):
+    def get(
+        self, *args, project: Optional[Project] = None, user: Optional[User] = None, **kwargs
+    ) -> Union["ProjectMember", None]:
         if not project or not user:
             return super().get(*args, project=project, user=user, **kwargs)
 
@@ -64,7 +67,7 @@ class ProjectMember(models.Model):
 
     def delete(self, *args, **kwargs):
         ProjectMemberCache.invalidate(self.project.id, self.user.id)
-        super().delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         result = super().save(*args, **kwargs)

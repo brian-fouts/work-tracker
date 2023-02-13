@@ -37,7 +37,6 @@ def access_token(client, user, username, password):
     return token_data["access"]
 
 
-
 @pytest.fixture(autouse=True)
 def reset_cache():
     """
@@ -67,6 +66,7 @@ def authorized_client(headers):
     from django.test import Client
 
     return Client(**headers)
+
 
 @pytest.fixture
 def project(authorized_client):

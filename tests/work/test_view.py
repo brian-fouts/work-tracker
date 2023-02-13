@@ -2,12 +2,9 @@ import json
 
 import pytest
 
+
 def create_work(authorized_client, project, duration=1.25):
-    data = {
-        "project": project["id"],
-        "start_time": "2023-01-01T10:10:01",
-        "duration": duration
-    }
+    data = {"project": project["id"], "start_time": "2023-01-01T10:10:01", "duration": duration}
     return authorized_client.post("/work/", json.dumps(data), content_type="application/json")
 
 
@@ -58,7 +55,6 @@ def test_created_work_listed(authorized_client, project, user):
     works = json.loads(work_response.content)
 
     assert created_work["id"] in [work["id"] for work in works]
-
 
 
 @pytest.mark.acceptance
