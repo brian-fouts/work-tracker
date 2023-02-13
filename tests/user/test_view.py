@@ -4,6 +4,7 @@ import jwt
 import pytest
 
 
+@pytest.mark.smoke
 @pytest.mark.django_db
 def test_create_user(user):
     """
@@ -13,6 +14,7 @@ def test_create_user(user):
     assert user["id"] > 0
 
 
+@pytest.mark.smoke
 @pytest.mark.django_db
 def test_fetch_user(client, user):
     """
@@ -25,8 +27,9 @@ def test_fetch_user(client, user):
     assert fetched_user["id"] == user["id"]
 
 
+@pytest.mark.smoke
 @pytest.mark.django_db
-def test_access_token_claims_for_correct_user(access_token, user):
+def test_access_token_claims_contain_correct_user_id(access_token, user):
     """
     GIVEN a user that has been created
         AND an access token has been created for that user
@@ -35,3 +38,17 @@ def test_access_token_claims_for_correct_user(access_token, user):
     """
     claims = jwt.decode(access_token, options={"verify_signature": False})
     assert claims["user_id"] == user["id"]
+
+
+@pytest.mark.smoke
+@pytest.mark.django_db
+def test_auth_fails_for_unknown_user(client, username, password):
+    """
+    GIVEN that no user has been created
+    WHEN the token endpoint is invoked with invalid credentials
+    THEN no access token is returned
+    """
+    data = {"username": username, "password": password}
+    response = client.post("/token/", data)
+    token_data = json.loads(response.content)
+    assert "access" not in token_data
