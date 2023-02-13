@@ -1,0 +1,2 @@
+CREATE DATABASE work_tracker;
+GRANT ALL PRIVILEGES ON DATABASE work_tracker TO admin;
